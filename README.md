@@ -18,6 +18,6 @@ Luckily, I found this [controller kit](https://www.amazon.com/gp/product/B07V56Z
 In short, I'd like to have: PC -> OpenRGB -> (Serial) -> Arduino -> (ARGB Data In) -> RGB Fans
 
 ## Circuit Diagram
-I came up with this circuit diagram before realizing it was already made in this (controller board)[https://www.amazon.com/gp/product/B07V56ZBQC/], but it's still useful to look at, since I believe the board follows the same-ish circuit:
+I came up with this circuit diagram before realizing it was already made in this [controller board](https://www.amazon.com/gp/product/B07V56ZBQC/), but it's still useful to look at, since I believe the board follows the same-ish circuit:
 
 ![Circuit Diagram](docs/images/CircuitDiagram.png?raw=true "Circuit Diagram")
