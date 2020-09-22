@@ -45,7 +45,7 @@ void HeaderConfig::init(RGBHeaderConfig config[], int address, uint8_t numHeader
 
     for (uint8_t i = 0; i < numHeaders; i++)
     {
-        config[i] = {1, STATIC, {CRGB(255, 255, 255), CRGB(255, 255, 255), CRGB(255, 255, 255)}};
+        config[i] = {1, CONSTANT, {CRGB(255, 255, 255), CRGB(255, 255, 255), CRGB(255, 255, 255)}};
         writeToRom(&config[i], address, i);
     }
 }

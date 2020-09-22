@@ -13,9 +13,14 @@ public:
 private:
     static CRGB leds[MAX_LEDS];
     static RGBHeaderConfig config[NUM_HEADERS];
+    static uint8_t dataCache[NUM_HEADERS * HEADER_DATA_CACHE_SIZE];
+
+    static void colorLoop();
 
     template <unsigned H> static void setupLeds();
     static void setupConfig();
+
+    static uint8_t* getHeaderDataCache(uint8_t header);
 };
 
 #endif

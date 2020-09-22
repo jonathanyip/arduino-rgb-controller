@@ -5,8 +5,8 @@
  * LED Modes
  */
 typedef uint8_t LedMode;
-const PROGMEM LedMode OFF = 0,
-                      STATIC = 1;
+const PROGMEM LedMode OFF       = 0,
+                      CONSTANT  = 1;
 
 /**
  * RGBHeaderConfig represents the state of a single RGB header (data pin out)
