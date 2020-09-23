@@ -9,11 +9,18 @@ const PROGMEM LedMode OFF       = 0,
                       CONSTANT  = 1;
 
 /**
+ * LED Modes Data Structs
+ */
+struct ConstantData {
+    CRGB color;
+};
+
+/**
  * RGBHeaderConfig represents the state of a single RGB header (data pin out)
  * Layout (12 bytes): [numLeds: 1 byte][mode: 1 byte][data: 10 bytes]
  * @param numLeds   Number of LEDs in this header
  * @param mode      Mode that LEDs are in
- * @param data      Config data. May contain initial RGB colors, etc. whatever the mode requires
+ * @param data      LED Modes data structs. May contain initial RGB colors, etc. whatever the mode requires
  */
 struct RGBHeaderConfig
 {

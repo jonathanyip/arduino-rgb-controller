@@ -4,10 +4,6 @@
 #include <FastLED.h>
 #include "config.hpp"
 
-struct ConstantData {
-    CRGB color;
-};
-
 /**
  * Colorizer applies colors to RGBs
  */
