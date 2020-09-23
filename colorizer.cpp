@@ -28,10 +28,14 @@ bool Colorizer::off(RGBHeaderConfig *config, CRGB *leds, uint8_t *cache, bool ne
 {
     UNUSED_PARAM(cache);
 
-    // Turn off all LEDs on this header
-    for (uint8_t i = 0; i < config->numLeds; i++)
+    // Only need to run this once
+    if (needsInit)
     {
-        leds[i] = CRGB::Black;
+        // Turn off all LEDs on this header
+        for (uint8_t i = 0; i < config->numLeds; i++)
+        {
+            leds[i] = CRGB::Black;
+        }
     }
 
     return needsInit;
@@ -44,13 +48,17 @@ bool Colorizer::constant(RGBHeaderConfig *config, CRGB *leds, uint8_t *cache, bo
 {
     UNUSED_PARAM(cache);
 
-    // Extract saved color from data
-    ConstantData *a = (ConstantData*) config->data;
-
-    // Switch LED color to the constant
-    for (uint8_t i = 0; i < config->numLeds; i++)
+    // Only need to run this once
+    if (needsInit)
     {
-        leds[i] = a->color;
+        // Extract saved color from data
+        ConstantData *a = (ConstantData*) config->data;
+
+        // Switch LED color to the constant
+        for (uint8_t i = 0; i < config->numLeds; i++)
+        {
+            leds[i] = a->color;
+        }
     }
 
     return needsInit;
