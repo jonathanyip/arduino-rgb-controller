@@ -1,6 +1,10 @@
 #ifndef MACROS_HPP
 #define MACROS_HPP
 
+// Used when a parameter is explicitly not used
+// But we don't want to generate an warning
+#define UNUSED_PARAM(expr) (void)(expr);
+
 /**
  * CONSTEXPR_SUM sums a constexpr array
  * @tparam T Type of elements in the array

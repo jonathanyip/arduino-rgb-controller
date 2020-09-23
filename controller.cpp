@@ -1,17 +1,32 @@
 #include "controller.hpp"
-#include "colormode.hpp"
+#include "colorizer.hpp"
 
-CRGB Controller::leds[MAX_LEDS];
+// Stores individual LED color data for FastLED
+CRGB Controller::leds[NUM_HEADERS][MAX_LEDS_PER_HEADER];
+
+// Stores saved configs for each header
 RGBHeaderConfig Controller::config[NUM_HEADERS];
-uint8_t Controller::dataCache[NUM_HEADERS * HEADER_DATA_CACHE_SIZE];
+
+// Temporary space for headers to store state between loops
+uint8_t Controller::dataCache[NUM_HEADERS][HEADER_DATA_CACHE_SIZE];
+
+// Set to true when the header has not been set yet
+// Or has just got a new config value and needs initialization
+bool Controller::needsInit[NUM_HEADERS];
 
 /**
  * Runs any setup for the controller. This should be run before loop() is called.
  */
 void Controller::setup()
 {
-    setupConfig();
+    HeaderConfig::load(config, CONFIG_START_ADDR, NUM_HEADERS);
     setupLeds<NUM_HEADERS>();
+
+    // All headers start off as needing initialization
+    for(uint8_t i = 0; i < NUM_HEADERS; i++)
+    {
+        needsInit[i] = true;
+    }
 }
 
 /**
@@ -22,49 +37,29 @@ void Controller::loop()
     colorLoop();
 }
 
+/**
+ * Loop that handles colors
+ */
 void Controller::colorLoop()
 {
     uint8_t changed = 0;
 
     // Run color changes for each header
-    for (uint8_t i = 0; i < NUM_HEADERS; i++) {
-        RGBHeaderConfig &headerConfig = config[i];
+    for (uint8_t i = 0; i < NUM_HEADERS; i++)
+    {
+        Colorizer::applyColor(&config[i], leds[i], dataCache[i], needsInit[i]);
 
-        switch(headerConfig.mode)
+        if(needsInit[i])
         {
-        case OFF:
-            changed = ColorMode::off(headerConfig, getHeaderDataCache(i));
-            break;
-        case CONSTANT:
-            changed = ColorMode::constant(headerConfig, getHeaderDataCache(i));
-            break;
+            needsInit[i] = false;
         }
     }
 
-    // If something changed, tell FastLED to refresh the line
+    // If something changed, tell FastLED to refresh the leds
     if (changed != 0)
     {
         FastLED.show();
     }
-}
-
-/**
- * Gets the data cache for a header
- * The data cache is used by ColorMode to save state between loops for a header
- * @param header Header to get cache for
- * @return Pointer to the data cache location
- */
-uint8_t* Controller::getHeaderDataCache(uint8_t header)
-{
-    return &dataCache[header * HEADER_DATA_CACHE_SIZE];
-}
-
-/**
- * Sets up the config variable in memory
- */
-void Controller::setupConfig()
-{
-    HeaderConfig::load(config, CONFIG_START_ADDR, NUM_HEADERS);
 }
 
 /**
@@ -73,8 +68,7 @@ void Controller::setupConfig()
  */
 template <unsigned H> void Controller::setupLeds()
 {
-    CRGB *ledSlice = &leds[(H-1) * MAX_LEDS_PER_HEADER];
-    FastLED.addLeds<WS2812B, HEADER_PINS[H-1]>(ledSlice, config[H-1].numLeds);
+    FastLED.addLeds<WS2812B, HEADER_PINS[H-1]>(leds[H-1], config[H-1].numLeds);
     setupLeds<H-1>();
 }
 template <> void Controller::setupLeds<0u>() {}

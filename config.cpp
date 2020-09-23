@@ -1,5 +1,5 @@
 #include <EEPROM.h>
-#include <FastLED.h>
+#include "constants.hpp"
 #include "config.hpp"
 
 /**
@@ -33,7 +33,7 @@ void HeaderConfig::load(RGBHeaderConfig config[], int address, uint8_t numHeader
 
 /**
  * Initializes the config in EEPROM and memory
- * All headers start with 1 LED and a constant white colored
+ * All headers start OFF
  * @param config Array of header configs to write to
  * @param address Starting address in EEPROM to write configs to
  * @param numHeaders Number of headers this controller has
@@ -45,7 +45,7 @@ void HeaderConfig::init(RGBHeaderConfig config[], int address, uint8_t numHeader
 
     for (uint8_t i = 0; i < numHeaders; i++)
     {
-        config[i] = {1, CONSTANT, {CRGB(255, 255, 255), CRGB(255, 255, 255), CRGB(255, 255, 255)}};
+        config[i] = {1, OFF, {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}};
         writeToRom(&config[i], address, i);
     }
 }
