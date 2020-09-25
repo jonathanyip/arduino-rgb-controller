@@ -19,14 +19,27 @@ bool Controller::needsInit[NUM_HEADERS];
  */
 void Controller::setup()
 {
+    // Set up serial
+    Serial.begin(SERIAL_BAUD_RATE);
+    Serial.println();
+
+    // Load header config into memory
     HeaderConfig::load(config, CONFIG_START_ADDR, NUM_HEADERS);
+
+    // Set up LEDs
     setupLeds<NUM_HEADERS>();
 
-    // All headers start off as needing initialization
+    // All headers need to be reset at the beginning
     for(uint8_t i = 0; i < NUM_HEADERS; i++)
     {
         needsInit[i] = true;
     }
+
+    char debugLine[64];
+    sprintf(debugLine, "DEBUG %u %u %u %u\n", NUM_HEADERS, MAX_LEDS_PER_HEADER, MAX_LEDS, HEADER_DATA_CACHE_SIZE);
+    Serial.println(debugLine);
+
+    Serial.println("DEBUG Arduino is set up!\n");
 }
 
 /**
@@ -34,6 +47,7 @@ void Controller::setup()
  */
 void Controller::loop()
 {
+    serialLoop();
     colorLoop();
 }
 
@@ -60,6 +74,71 @@ void Controller::colorLoop()
     {
         FastLED.show();
     }
+}
+
+/**
+ * Loop that handles serial inputs
+ */
+void Controller::serialLoop()
+{
+    // Wait for sync byte
+    if (Serial.available() > 0)
+    {
+        char syncByte = Serial.read();
+
+        // If the sync byte does not match, clear the buffer and continue
+        if (syncByte != SERIAL_SYNC_BYTE)
+        {
+            while(Serial.available() > 0) { Serial.read(); }
+            return;
+        }
+
+        // Tell computer we are ready for input
+        Serial.write(SERIAL_ACK_BYTE);
+
+        // Read action bytes
+        ActionPacket actionPacket;
+        if (!readBytes((uint8_t*) &actionPacket, sizeof(ActionPacket))) return;
+
+        // Do something based on action
+        switch (actionPacket.action)
+        {
+        case SET_HEADER_CONFIG: break;
+        case WIPE_CONFIG: break;
+        }
+    }
+}
+
+/**
+ * Reads bytes from serial
+ * @param buffer Buffer to store data in
+ * @param bytes Number of bytes to read
+ * @return true if it manages to read. False if it times out
+ */
+bool Controller::readBytes(uint8_t *buffer, size_t bytes)
+{
+    // Collect serial data into a buffer
+    unsigned long timeout = millis();
+    for (uint8_t i = 0; i < bytes; i++)
+    {
+        while(Serial.available() == 0)
+        {
+            // Timed out, break out of the loop
+            if (millis() - timeout > SERIAL_TIMEOUT_MS)
+            {
+                return false;
+            }
+        }
+
+        // Reset timeout
+        timeout = millis();
+        *buffer = Serial.read();
+
+        // Advance pointer
+        buffer++;
+    }
+
+    return true;
 }
 
 /**

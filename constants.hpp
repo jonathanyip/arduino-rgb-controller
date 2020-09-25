@@ -27,4 +27,7 @@ constexpr PROGMEM uint8_t HEADER_PINS[] = {3, 5, 6, 9, 10, 11};
 // Starting address to write config data in EEPROM
 #define CONFIG_START_ADDR       0x400
 
+// Serial rate
+#define SERIAL_BAUD_RATE        9600
+
 #endif
